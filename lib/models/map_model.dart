@@ -12,26 +12,33 @@ class MapModel {
   List<List<CaseModel>> _cases = List<List<CaseModel>>.empty();
 
   void initCases() {
-    int size1 = 10, size2 = 10;
+    nbLine = 10;
+    nbCol = 10;
     
     _cases = List<List<CaseModel>>.generate(
-      size1, (i) => List<CaseModel>.generate(
-        size2, (j) => CaseModel()
+        nbLine, (i) => List<CaseModel>.generate(
+          nbCol, (j) => CaseModel()
       )
     );
   }
   
   void initBombes(double repartition) {
+    int x;
+
     for (List<CaseModel> l in _cases) {
       for (CaseModel c in l) {
-        c.setBomb(Random().nextInt(100) < repartition);
+        x = Random().nextInt(100);
+        c.setBomb(x < repartition);
+        if (x < repartition) {
+          nbBomb++;
+        }
       }
     }
   }
 
   void initNumbers() {
-    for (int x = 0; x <= _cases.length; x++) {
-      for (int y = 0; y <= _cases[0].length; y++) {
+    for (int x = 0; x <= nbLine; x++) {
+      for (int y = 0; y <= nbCol; y++) {
         _cases[x][y].setNumber(computeNumber(x, y));
       }
     }
@@ -47,7 +54,7 @@ class MapModel {
   CaseModel? tryGetCase(int x, int y) {
     CaseModel? c;
 
-    if ((x >= 0 && x <= _cases.length) && (y >= 0 && y <= _cases[0].length)) {
+    if ((x >= 0 && x <= nbLine) && (y >= 0 && y <= nbCol)) {
       c = _cases[x][y];
     }
 
@@ -86,8 +93,8 @@ class MapModel {
 
   void revealAll() {
 
-    for (int x = 0; x <= _cases.length; x++) {
-      for (int y = 0; y <= _cases[0].length; y++) {
+    for (int x = 0; x <= nbLine; x++) {
+      for (int y = 0; y <= nbCol; y++) {
         _cases[x][y].reveal();
       }
     }
