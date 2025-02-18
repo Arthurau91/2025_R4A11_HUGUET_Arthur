@@ -5,114 +5,74 @@ import 'dart:math';
 import 'case_model.dart';
 
 class MapModel {
-  
-  int nbLine = 0;
-  int nbCol = 0;
-  int nbBomb = 0;
-  List<List<CaseModel>> _cases = List<List<CaseModel>>.empty();
+  late int nbLine;
+  late int nbCol;
+  late int nbBomb;
+  late List<List<CaseModel>> cases;
+
+  void initMap(nbLine, nbCol, nbBomb) {
+    this.nbLine = nbLine;
+    this.nbCol = nbCol;
+    this.nbBomb = nbBomb;
+    generateMap();
+  }
+
+  void generateMap() {
+    initCases();
+    initBomb();
+    initNumbers();
+  }
 
   void initCases() {
-    nbLine = 10;
-    nbCol = 10;
-    
-    _cases = List<List<CaseModel>>.generate(
-        nbLine, (i) => List<CaseModel>.generate(
-          nbCol, (j) => CaseModel()
-      )
+    cases = List.generate(
+      nbLine,
+          (x) => List.generate(
+        nbCol,
+            (y) => CaseModel(),
+      ),
     );
   }
-  
-  void initBombes(double repartition) {
-    int x;
 
-    for (List<CaseModel> l in _cases) {
-      for (CaseModel c in l) {
-        x = Random().nextInt(100);
-        c.setBomb(x < repartition);
-        if (x < repartition) {
-          nbBomb++;
-        }
+  void initBomb() {
+    int count = 0;
+    Random random = Random();
+    while (count < nbBomb) {
+      int x = random.nextInt(nbLine);
+      int y = random.nextInt(nbCol);
+      if (!cases[x][y].hasBomb) {
+        cases[x][y].hasBomb = true;
+        count++;
       }
     }
   }
 
   void initNumbers() {
-    for (int x = 0; x <= nbLine; x++) {
-      for (int y = 0; y <= nbCol; y++) {
-        _cases[x][y].setNumber(computeNumber(x, y));
-      }
-    }
-  }
-
-  void generateMap() {
-
-    initCases();
-    initBombes(50);
-    initNumbers();
-  }
-
-  CaseModel? tryGetCase(int x, int y) {
-    CaseModel? c;
-
-    if ((x >= 0 && x <= nbLine) && (y >= 0 && y <= nbCol)) {
-      c = _cases[x][y];
-    }
-
-    return c;
-  }
-
-  int computeNumber(int x, int y) {
-    int comp = 0;
-    int nx, ny;
-    CaseModel? c;
-
-    for (int i = -1; i <= 1; i++) {
-      for (int j = -1; j <= 1; j++) {
-        nx = x + i;
-        ny = y + i;
-
-        c = tryGetCase(nx, ny);
-        if (c != null) {
-          if (c.hasbomb) {
-            comp++;
-          }
+    for (int x = 0; x < nbLine; x++) {
+      for (int y = 0; y < nbCol; y++) {
+        if (!cases[x][y].hasBomb) {
+          cases[x][y].number = computeNumber(x, y);
         }
       }
     }
-
-    return comp;
   }
 
-  void reveal(int x, int y) {
-
-    CaseModel? c = tryGetCase(x, y);
-    if (c != null) {
-      c.reveal();
-    }
-  }
-
-  void revealAll() {
-
-    for (int x = 0; x <= nbLine; x++) {
-      for (int y = 0; y <= nbCol; y++) {
-        _cases[x][y].reveal();
+  int computeNumber(int x, int y) {
+    int count = 0;
+    for (int dx = -1; dx <= 1; dx++) {
+      for (int dy = -1; dy <= 1; dy++) {
+        if (dx == 0 && dy == 0) continue;
+        if (tryGetCase(x + dx, y + dy)?.hasBomb ?? false) {
+          count++;
+        }
       }
     }
+    return count;
   }
 
-  void explode(int x, int y) {
-
-    CaseModel? c = tryGetCase(x, y);
-    if (c != null) {
-      c.explode();
+  CaseModel? tryGetCase(int x, int y) {
+    if (x >= 0 && x < nbLine && y >= 0 && y < nbCol) {
+      return cases[x][y];
     }
-  }
-
-  void toggleFlag(int x, int y) {
-
-    CaseModel? c = tryGetCase(x, y);
-    if (c != null) {
-      c.toggleFlag();
-    }
+    return null;
   }
 }

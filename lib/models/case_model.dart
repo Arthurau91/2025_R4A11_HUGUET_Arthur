@@ -1,33 +1,21 @@
 
 
 class CaseModel {
+  bool hidden;
+  bool hasBomb;
+  bool hasExploded;
+  bool hasFlag;
+  int? number;
 
-  bool _hidden = true;
-  bool _hasBomb = false;
-  bool? _hasExploded;
-  bool _hasFlag = false;
-  int _number = 0;
+  CaseModel({
+    this.hidden = true,
+    this.hasBomb = false,
+    this.hasExploded = false,
+    this.hasFlag = false,
+    this.number,
+  });
 
-  get hasbomb => _hasBomb;
-
-  void explode() {
-    _hasExploded = true;
+  bool isRevealed() {
+    return !hidden;
   }
-
-  void reveal() {
-    _hidden = false;
-  }
-
-  void toggleFlag() {
-    _hasFlag = _hasFlag == true;
-  }
-
-  void setNumber(int num) {
-    _number = num;
-  }
-
-  void setBomb(bool bombBool){
-    _hasBomb = bombBool;
-  }
-
 }
